@@ -13,11 +13,11 @@ class Map:
     map = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-           [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-           [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+           [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+           [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1],
            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
 
@@ -38,12 +38,32 @@ class Map:
             offset = (item.rect.x + playerOffset[0], item.rect.y + playerOffset[1])
             self.screen.blit(item.image, offset)
 
-    def checkCollision(self, playerRect):
-        pass
+    def checkHorizontalCollision(self, player):
+        player.rect.x += player.direction.x * player.speed
+        for block in self.block_list:
+            if player.rect.colliderect(block):
+                if player.direction.x > 0:
+                    player.rect.right = block.rect.left
+                elif player.direction.x < 0:
+                    player.rect.left = block.rect.right
 
-    def update(self, playerOffset, playerRect):
-        self.draw(playerOffset)
-        self.checkCollision(playerRect)
+    def checkVerticalCollision(self, player):
+        player.applyGravity()
+        player.rect.y += player.direction.y
+        for block in self.block_list:
+            if player.rect.colliderect(block):
+                if player.direction.y > 0:
+                    player.rect.bottom = block.rect.top
+                    player.direction.y = 0
+                    player.isJump = False
+                elif player.direction.y < 0:
+                    player.rect.top = block.rect.bottom
+                    player.direction.y = 0
+
+    def update(self, player):
+        self.draw(player.offset)
+        self.checkHorizontalCollision(player)
+        self.checkVerticalCollision(player)
 
 
 

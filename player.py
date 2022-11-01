@@ -15,6 +15,10 @@ class Player(pygame.sprite.Sprite):
 
         # Basic movement
         self.speed = 5
+        self.direction = pygame.math.Vector2(0,0)
+        self.gravity = 0.4
+        self.jumpSpeed = -15
+        self.isJump = False
 
         # Collision detections
 
@@ -29,16 +33,21 @@ class Player(pygame.sprite.Sprite):
     def controller(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_d]:
-            self.rect.x += self.speed
+            self.direction.x = 1
         elif keys[pygame.K_a]:
-            self.rect.x -= self.speed
-        if keys[pygame.K_w]:
-            self.rect.y -= self.speed
-        elif keys[pygame.K_s]:
-            self.rect.y += self.speed
+            self.direction.x = -1
+        else:
+            self.direction.x = 0
+        if keys[pygame.K_SPACE] and not self.isJump:
+            self.direction.y = self.jumpSpeed
+            self.isJump = True
+
+    def applyGravity(self):
+        self.direction.y += self.gravity
 
     def update(self):
         self.controller()
+        self.applyGravity()
         self.updateOffSet()
         self.draw()
 

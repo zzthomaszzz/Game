@@ -24,7 +24,7 @@ while True:
     elif keys[pygame.K_a]:
         offset += pygame.math.Vector2(1,0)
     screen.fill((122, 120, 30))
-    game_map.draw(player.offset)
+    game_map.update(player)
     player.update()
     pygame.display.update()
     clock.tick(60)
