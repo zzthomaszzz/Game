@@ -1,5 +1,6 @@
 import pygame
 import math
+import bullet
 
 
 class Player(pygame.sprite.Sprite):
@@ -16,25 +17,26 @@ class Player(pygame.sprite.Sprite):
 
         # Basic movement
         self.speed = 5
-        self.direction = pygame.math.Vector2(0,0)
+        self.direction = pygame.math.Vector2(0, 0)
         self.gravity = 0.4
         self.jumpSpeed = -15
         self.isJump = False
 
         # Bullets
         self.angleInRad = 0
-        self.target_x, self.target_y = pygame.mouse.get_pos()
+        self.target_x, self.target_y = pygame.mouse.get_pos() - self.offset
         self.bulletX = 0
         self.bulletY = 0
+        self.bulletList = []
         # Collision detections
 
     def getAngle(self):
-        self.angleInRad = math.atan2(-(self.target_y - -self.rect.center[1]), self.target_x - self.rect.center[0])
+        self.target_x, self.target_y = pygame.mouse.get_pos() - self.offset
+        self.angleInRad = math.atan2(self.target_y - self.rect.center[1], self.target_x - self.rect.center[0])
 
     def setBulletSpeed(self):
         self.bulletX = math.cos(self.angleInRad)
         self.bulletY = math.sin(self.angleInRad)
-
 
     def draw(self):
         offset = pygame.math.Vector2(self.rect.x + self.offset[0], self.rect.y + self.offset[1])
@@ -56,6 +58,21 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = self.jumpSpeed
             self.isJump = True
 
+        # TESTING
+        if pygame.mouse.get_pressed()[0]:
+            self.getAngle()
+            self.setBulletSpeed()
+            print(self.bulletX, self.bulletY)
+            if len(self.bulletList) < 100:
+                self.bulletList.append(bullet.Bullet(self))
+
+    def drawBullet(self):
+        if self.bulletList:
+            for _bullet in self.bulletList:
+                _bullet.pos += (_bullet.direction * _bullet.speed)
+                offset = pygame.math.Vector2(_bullet.pos[0] + self.offset[0], _bullet.pos[1] + self.offset[1])
+                pygame.draw.rect(self.screen, (255, 0, 0), (offset[0], offset[1], 5, 5))
+
     def applyGravity(self):
         self.direction.y += self.gravity
 
@@ -63,5 +80,5 @@ class Player(pygame.sprite.Sprite):
         self.controller()
         self.applyGravity()
         self.updateOffSet()
+        self.drawBullet()
         self.draw()
-
