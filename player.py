@@ -1,4 +1,5 @@
 import pygame
+import math
 
 
 class Player(pygame.sprite.Sprite):
@@ -20,7 +21,20 @@ class Player(pygame.sprite.Sprite):
         self.jumpSpeed = -15
         self.isJump = False
 
+        # Bullets
+        self.angleInRad = 0
+        self.target_x, self.target_y = pygame.mouse.get_pos()
+        self.bulletX = 0
+        self.bulletY = 0
         # Collision detections
+
+    def getAngle(self):
+        self.angleInRad = math.atan2(-(self.target_y - -self.rect.center[1]), self.target_x - self.rect.center[0])
+
+    def setBulletSpeed(self):
+        self.bulletX = math.cos(self.angleInRad)
+        self.bulletY = math.sin(self.angleInRad)
+
 
     def draw(self):
         offset = pygame.math.Vector2(self.rect.x + self.offset[0], self.rect.y + self.offset[1])
