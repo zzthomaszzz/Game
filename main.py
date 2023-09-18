@@ -18,8 +18,6 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pass
     keys = pygame.key.get_pressed()
     if keys[pygame.K_d]:
         offset -= pygame.math.Vector2(1,0)

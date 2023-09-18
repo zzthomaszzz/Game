@@ -28,6 +28,8 @@ class Player(pygame.sprite.Sprite):
         self.bulletX = 0
         self.bulletY = 0
         self.bulletList = []
+        self.resetCooldown = 2
+        self.resetTick = 0
         # Collision detections
 
     def getAngle(self):
@@ -60,18 +62,27 @@ class Player(pygame.sprite.Sprite):
 
         # TESTING
         if pygame.mouse.get_pressed()[0]:
-            self.getAngle()
-            self.setBulletSpeed()
-            print(self.bulletX, self.bulletY)
-            if len(self.bulletList) < 100:
-                self.bulletList.append(bullet.Bullet(self))
+            if self.resetTick > self.resetCooldown:
+                self.getAngle()
+                self.setBulletSpeed()
+                print(self.bulletX, self.bulletY)
+                if len(self.bulletList) < 100:
+                    self.bulletList.append(bullet.Bullet(self))
+                else:
+                    self.bulletList.pop(-1)
+                    self.bulletList.append(bullet.Bullet(self))
+                self.resetTick = 0
+            else:
+                self.resetTick += 1
 
     def drawBullet(self):
         if self.bulletList:
+            i = 0
             for _bullet in self.bulletList:
                 _bullet.pos += (_bullet.direction * _bullet.speed)
                 offset = pygame.math.Vector2(_bullet.pos[0] + self.offset[0], _bullet.pos[1] + self.offset[1])
                 pygame.draw.rect(self.screen, (255, 0, 0), (offset[0], offset[1], 5, 5))
+                i += 1
 
     def applyGravity(self):
         self.direction.y += self.gravity
